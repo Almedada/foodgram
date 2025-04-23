@@ -1,3 +1,5 @@
+version: '3.3'
+
 volumes:
   pg_data:
   static:
@@ -5,7 +7,7 @@ volumes:
 
 services:
   db:
-    image: postgres:13.10
+    image: postgres:13
     env_file: ../.env
     ports:
       - 5432:5432
@@ -22,8 +24,7 @@ services:
       - media:/app/media
 
   frontend:
-    container_name: foodgram-frontend
-    # build: ../frontend
+    container_name: foodgram-front
     image: almedada/foodgram_frontend:latest
   
     volumes:
@@ -31,7 +32,7 @@ services:
   
   nginx:
     container_name: foodgram-proxy
-    image: nginx:1.25.4
+    image: nginx:1.25.4-alpine
     ports:
       - "80:80"
     volumes:
