@@ -23,7 +23,6 @@ services:
 
   frontend:
     container_name: foodgram-frontend
-    # build: ../frontend
     image: almedada/foodgram_frontend:latest
   
     volumes:

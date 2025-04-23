@@ -19,7 +19,7 @@ def debug_check(debug):
 
 DEBUG = debug_check(os.getenv('DEBUG_MODE', True))
 
-ALLOWED_HOSTS = ['*', 'localhost, 127.0.0.1', 'https://foodgram75.zapto.org/']
+ALLOWED_HOSTS = ['*', 'localhost', '127.0.0.1', 'foodgram75.zapto.org', '158.160.0.87']
 
 
 # Application definition
