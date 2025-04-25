@@ -5,7 +5,6 @@ from users.models import User
 
 
 class Ingredient(models.Model):
-
     name = models.CharField(
         db_index=True,
         max_length=150,
@@ -21,7 +20,6 @@ class Ingredient(models.Model):
 
 
 class Tag(models.Model):
-
     name = models.CharField(
         max_length=200, unique=True,)
     slug = models.SlugField(
@@ -37,7 +35,6 @@ class Tag(models.Model):
 
 
 class Recipe(models.Model):
-
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -55,7 +52,7 @@ class Recipe(models.Model):
     )
     text = models.TextField(
         verbose_name='Описание рецепта',
-        help_text='Опишите приготовление рецепта'
+        help_text='Опишите приготовление блюда'
     )
     name = models.CharField(
         max_length=200,
@@ -64,9 +61,9 @@ class Recipe(models.Model):
         help_text='Введите название рецепта',
     )
     cooking_time = models.PositiveSmallIntegerField(
-        validators=[MinValueValidator(1, 'Минимальное время приготовления')],
+        validators=[MinValueValidator(1, 'Минимальное время')],
         verbose_name='Время приготовления',
-        help_text='Укажите время приготовления рецепта в минутах',
+        help_text='Укажите время приготовления блюда в минутах',
     )
     image = models.ImageField(
         verbose_name='Картинка рецепта',
@@ -88,7 +85,6 @@ class Recipe(models.Model):
 
 
 class IngredientRecipe(models.Model):
-
     recipe = models.ForeignKey(
         Recipe,
         related_name='recipe_ingredients',
@@ -102,7 +98,9 @@ class IngredientRecipe(models.Model):
         help_text='Укажите ингредиенты')
     amount = models.PositiveSmallIntegerField(
         validators=[
-            MinValueValidator(1, 'Минимальное количество ингредиентов 1')],
+            MinValueValidator(
+                1, 'Минимальное количество ингредиентов начинается от 1'
+            )],
         verbose_name='Количество',
         help_text='Укажите количество ингредиента')
 
@@ -119,7 +117,6 @@ class IngredientRecipe(models.Model):
 
 
 class ShoppingCart(models.Model):
-
     user = models.ForeignKey(
         User,
         related_name='shopping_cart',
@@ -143,7 +140,6 @@ class ShoppingCart(models.Model):
 
 
 class Favorite(models.Model):
-
     user = models.ForeignKey(
         User,
         related_name='favorite',

@@ -13,7 +13,6 @@ from .models import Subscription, User
 
 
 class MyUserViewSet(UserViewSet):
-
     pagination_class = MyPageNumberPaginator
 
     @action(["get", "put", "patch", "delete"],
