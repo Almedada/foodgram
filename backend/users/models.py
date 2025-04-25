@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from foodgram_backend.constants import MAX_EMAIL_LENGTH, MAX_NAME_LENGTH
 
 
 class MyUser(AbstractUser):
@@ -9,13 +10,13 @@ class MyUser(AbstractUser):
     )
     email = models.CharField(
         unique=True,
-        max_length=150,
+        max_length=MAX_EMAIL_LENGTH,
     )
     first_name = models.CharField(
-        max_length=150
+        max_length=MAX_NAME_LENGTH,
     )
     last_name = models.CharField(
-        max_length=150
+        max_length=MAX_NAME_LENGTH,
     )
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name', 'username']
@@ -40,8 +41,8 @@ class Subscription(models.Model):
 
     class Meta:
         unique_together = ('subscriber', 'subscribed_to')
-        verbose_name = 'Избранный рецепт'
-        verbose_name_plural = 'Избранные рецепты'
+        verbose_name = 'Подписка'
+        verbose_name_plural = 'Подписки'
 
     def __str__(self):
-        return f'{self.user} подписался на {self.recipe}'
+        return f'{self.subscriber} подписался на {self.subscribed_to}'

@@ -146,3 +146,5 @@ DJOSER = {
         'current_user': 'api.serializers.MyUserSerializer',
     },
 }
+
+PAGE_SIZE = 6

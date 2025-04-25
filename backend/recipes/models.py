@@ -1,17 +1,26 @@
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
-
 from users.models import User
+from foodgram_backend.constants import (
+    MAX_INGREDIENT_NAME_LENGTH,
+    MAX_MEASUREMENT_UNIT_LENGTH,
+    MAX_TAG_NAME_LENGTH,
+    MAX_TAG_SLUG_LENGTH,
+    MAX_RECIPE_NAME_LENGTH,
+    MIN_COOKING_TIME,
+    MIN_INGREDIENT_AMOUNT,
+    MAX_INGREDIENT_AMOUNT
+)
 
 
 class Ingredient(models.Model):
     name = models.CharField(
         db_index=True,
-        max_length=150,
+        max_length=MAX_INGREDIENT_NAME_LENGTH,
         verbose_name='Название ингредиента',
     )
     measurement_unit = models.CharField(
-        max_length=150,
+        max_length=MAX_MEASUREMENT_UNIT_LENGTH,
         verbose_name='Единица измерения',
     )
 
@@ -21,9 +30,12 @@ class Ingredient(models.Model):
 
 class Tag(models.Model):
     name = models.CharField(
-        max_length=200, unique=True,)
+        max_length=MAX_TAG_NAME_LENGTH,
+        unique=True,
+    )
     slug = models.SlugField(
-        max_length=200, unique=True,
+        max_length=MAX_TAG_SLUG_LENGTH,
+        unique=True,
     )
 
     class Meta:
@@ -55,13 +67,13 @@ class Recipe(models.Model):
         help_text='Опишите приготовление блюда'
     )
     name = models.CharField(
-        max_length=200,
+        max_length=MAX_RECIPE_NAME_LENGTH,
         db_index=True,
         verbose_name='Название рецепта',
         help_text='Введите название рецепта',
     )
     cooking_time = models.PositiveSmallIntegerField(
-        validators=[MinValueValidator(1, 'Минимальное время')],
+        validators=[MinValueValidator(MIN_COOKING_TIME, 'Минимальное время')],
         verbose_name='Время приготовления',
         help_text='Укажите время приготовления блюда в минутах',
     )
@@ -90,19 +102,30 @@ class IngredientRecipe(models.Model):
         related_name='recipe_ingredients',
         verbose_name='Название рецепта',
         on_delete=models.CASCADE,
-        help_text='Выберите рецепт')
+        help_text='Выберите рецепт'
+    )
     ingredient = models.ForeignKey(
         Ingredient,
         verbose_name='Ингредиент',
         on_delete=models.CASCADE,
-        help_text='Укажите ингредиенты')
+        help_text='Укажите ингредиенты'
+    )
     amount = models.PositiveSmallIntegerField(
         validators=[
-            MinValueValidator(
-                1, 'Минимальное количество ингредиентов начинается от 1'
-            )],
+            MinValueValidator
+            (
+                MIN_INGREDIENT_AMOUNT,
+                'Минимальное количество ингредиентов начинается от 1'
+            ),
+            MaxValueValidator
+            (
+                MAX_INGREDIENT_AMOUNT,
+                'Максимальное количество ингредиентов — 1000'
+            )
+        ],
         verbose_name='Количество',
-        help_text='Укажите количество ингредиента')
+        help_text='Укажите количество ингредиента'
+    )
 
     class Meta:
         verbose_name = 'Cостав рецепта'
@@ -110,7 +133,9 @@ class IngredientRecipe(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=['recipe', 'ingredient'],
-                name='unique_ingredients')]
+                name='unique_ingredients'
+            )
+        ]
 
     def __str__(self):
         return f'{self.ingredient} {self.amount}'
