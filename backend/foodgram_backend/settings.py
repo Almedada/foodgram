@@ -19,7 +19,7 @@ def debug_check(debug):
 
 DEBUG = debug_check(os.getenv('DEBUG_MODE', True))
 
-ALLOWED_HOSTS = ['*', 'localhost', '127.0.0.1', 'foodgram75.zapto.org', '158.160.0.87']
+ALLOWED_HOSTS = ['*', 'localhost', '127.0.0.1', 'foodgram7.zapto.org', '158.160.0.87']
 
 
 # Application definition
@@ -111,7 +111,7 @@ USE_TZ = True
 
 
 STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'collected_static')
+STATIC_ROOT = BASE_DIR / 'collected_static'
 
 
 MEDIA_URL = '/media/'
@@ -146,5 +146,9 @@ DJOSER = {
         'current_user': 'api.serializers.MyUserSerializer',
     },
 }
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://foodgram7.zapto.org',
+]
 
 PAGE_SIZE = 6
