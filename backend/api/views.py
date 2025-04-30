@@ -1,5 +1,4 @@
 from io import BytesIO
-
 from django.db.models import Sum
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404
@@ -49,12 +48,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
             permission_classes=[IsAuthenticated],
             url_path='favorite')
     def favorite_change(self, request, pk=None):
-
         recipe = get_object_or_404(Recipe, id=pk)
         user = self.request.user
         if request.method == 'POST':
-            if Favorite.objects.filter(user=user,
-                                       recipe=recipe).exists():
+            if Favorite.objects.filter(user=user, recipe=recipe).exists():
                 return Response({'errors': 'Рецепт уже добавлен!'},
                                 status=status.HTTP_400_BAD_REQUEST)
             serializer = FavoriteSerializer(
@@ -67,11 +64,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        if not Favorite.objects.filter(user=user,
-                                       recipe=recipe).exists():
+
+        if not Favorite.objects.filter(user=user, recipe=recipe).exists():
             return Response({'errors': 'Объект не найден'},
                             status=status.HTTP_404_NOT_FOUND)
-        Favorite.objects.get(recipe=recipe).delete()
+
+        Favorite.objects.get(user=user, recipe=recipe).delete()
         return Response('Рецепт успешно удалён из избранного.',
                         status=status.HTTP_204_NO_CONTENT)
 
@@ -79,18 +77,16 @@ class RecipeViewSet(viewsets.ModelViewSet):
             methods=['post', 'delete'],
             permission_classes=[IsAuthenticated],
             url_path='shopping_cart')
-    def shopping_carg_change(self, request, pk=None):
-
+    def shopping_cart_change(self, request, pk=None):
         recipe = get_object_or_404(Recipe, id=pk)
         user = self.request.user
         if request.method == 'POST':
-            if Favorite.objects.filter(user=user,
-                                       recipe=recipe).exists():
-                return Response({'errors': 'Рецепт уже добавлен!'},
+            if ShoppingCart.objects.filter(user=user, recipe=recipe).exists():
+                return Response({'errors': 'Рецепт уже добавлен в корзину!'},
                                 status=status.HTTP_400_BAD_REQUEST)
             serializer = ShoppingCartSerializer(
                 data={
-                    'user': request.user,
+                    'user': user,
                     'recipe': recipe.id
                 },
                 context={'request': request}
@@ -98,14 +94,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        if not ShoppingCart.objects.filter(
-            user=request.user,
-            recipe=recipe
-        ).exists():
-            return Response({'errors': 'Объект не найден'},
+
+        if not ShoppingCart.objects.filter(user=user, recipe=recipe).exists():
+            return Response({'errors': 'Объект не найден в корзине'},
                             status=status.HTTP_404_NOT_FOUND)
-        ShoppingCart.objects.get(recipe=recipe).delete()
-        return Response('Рецепт успешно удалён из избранного.',
+
+        ShoppingCart.objects.get(user=user, recipe=recipe).delete()
+        return Response('Рецепт успешно удалён из корзины.',
                         status=status.HTTP_204_NO_CONTENT)
 
     @action(['get'],
@@ -113,11 +108,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
             permission_classes=[IsAuthenticated],
             url_path='download_shopping_cart')
     def download_shopping_cart(self, request):
-
         recipe_ids = ShoppingCart.objects.filter(
-            user=request.user
-        ).values_list('recipe', flat=True)
-
+            user=request.user).values_list('recipe', flat=True)
         queryset = (
             IngredientRecipe.objects
             .filter(recipe_id__in=recipe_ids)
@@ -130,10 +122,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
         for result in queryset:
             ingredient = result['ingredient__name']
             total_amount = result['total_amount']
-            measurment_unit = result['ingredient__measurement_unit']
+            measurement_unit = result['ingredient__measurement_unit']
             buffer.write(
-                f'{ingredient}:{total_amount}'
-                f'{measurment_unit}.\n'.encode('utf-8')
+                f'{ingredient}: {total_amount} {measurement_unit}.\n'.encode(
+                    'utf-8')
             )
 
         buffer.seek(0)
@@ -146,7 +138,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return response
 
     @action(detail=True, methods=['get'], url_path='get-link')
-    def getlink(self, request, pk=None):
+    def get_link(self, request, pk=None):
         recipe = get_object_or_404(Recipe, pk=pk)
         serializer = ShortLinkSerializer(recipe, context={'request': request})
         return Response(serializer.data)

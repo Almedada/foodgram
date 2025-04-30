@@ -22,15 +22,14 @@ services:
       - media:/app/media
 
   frontend:
-    container_name: foodgram-frontend
+    container_name: foodgram-front
     image: almedada/foodgram_frontend:latest
-  
     volumes:
       - ../frontend/:/app/result_build/
-  
+
   nginx:
     container_name: foodgram-proxy
-    image: nginx:1.25.4
+    image: nginx:1.25.4-alpine
     ports:
       - "80:80"
     volumes:
